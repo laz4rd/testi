@@ -3,6 +3,7 @@ import { Barlow_Condensed, Instrument_Serif, Geist } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import TelemetryNavbar from "@/components/TelemetryNavbar";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -41,7 +42,7 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", barlowCondensed.variable, instrumentSerif.variable, displayTech.variable, "font-sans", geist.variable)}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col"><TelemetryNavbar />{children}</body>
     </html>
   );
 }

@@ -1,14 +1,14 @@
 "use client";
-import Image from "next/image";
-
 import DecryptedText from "@/components/DecryptedText";
 import Grainient from "@/components/Grainient";
 import TelemetryFlow from "@/components/Telemetry";
 import { motion } from "framer-motion";
+import PixelTrail from "@/components/PixelTrail";
 
 export default function Home() {
   return (
-    <div className="relative flex flex-col flex-1 items-center justify-center">
+    <div className="relative flex flex-col flex-1 items-center justify-center overflow-hidden">
+      {/* Background */}
       <div className="absolute inset-0 z-0">
         <Grainient
           color1="#FC0F49"
@@ -36,9 +36,22 @@ export default function Home() {
         />
         <TelemetryFlow className="absolute inset-0 z-10 showGrid" />
       </div>
-      <div className="relative z-10 flex flex-col items-center">
-        <h1 className="font-tech text-white text-[7vw]">36</h1>
 
+      {/* Cursor trail */}
+      <div className="absolute inset-0 z-20 pointer-events-none">
+        <PixelTrail
+          gridSize={22}
+          trailSize={0.1}
+          maxAge={500}
+          interpolate={2.6}
+          color="#B9E901"
+          gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
+        />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-30 flex flex-col items-center">
+        <h1 className="font-tech text-white text-[7vw]">36</h1>
         <h3 className="font-serif text-white text-[2vw] text-center w-full">
           <i>WHE </i>
           <span className="font-sans font-extrabold">RE INNOVATION ME</span>
