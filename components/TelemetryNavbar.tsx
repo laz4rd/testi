@@ -1,8 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, usePathname } from "next/navigation";
 
-const LINKS = ["Home", "Blog", "Links"];
+const LINKS = [
+  { label: "Home", href: "/" },
+  { label: "Who?", href: "/about" },
+  { label: "Blog", href: "/blog" },
+  { label: "Links", href: "/links" },
+];
 
 function BlinkDot() {
   return (
@@ -20,12 +26,15 @@ function BlinkDot() {
 }
 
 export default function TelemetryNavbar() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState("Home");
   const [pillVisible, setPillVisible] = useState(false);
   const pillRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLSpanElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const activeHref = LINKS.find(l => l.href === pathname)?.href ?? "/";
 
   useEffect(() => {
     const onScroll = () => {
@@ -44,7 +53,7 @@ export default function TelemetryNavbar() {
 
   useEffect(() => {
     if (!pillVisible) return;
-    const idx = LINKS.indexOf(active);
+    const idx = LINKS.findIndex(l => l.href === activeHref);
     const el = itemRefs.current[idx];
     const pill = pillRef.current;
     if (!el || !pill) return;
@@ -55,7 +64,7 @@ export default function TelemetryNavbar() {
       indicatorRef.current.style.width = `${elRect.width}px`;
       indicatorRef.current.style.height = `${elRect.height}px`;
     }
-  }, [active, pillVisible]);
+  }, [activeHref, pillVisible]);
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
@@ -68,8 +77,10 @@ export default function TelemetryNavbar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <motion.span
-              className="font-tech text-white text-xl tracking-widest"
+            {/* Logo */}
+            <motion.button
+              onClick={() => router.push("/")}
+              className="font-tech text-white text-xl tracking-widest cursor-pointer"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1] }}
               transition={{
@@ -79,20 +90,20 @@ export default function TelemetryNavbar() {
               }}
             >
               36
-            </motion.span>
+            </motion.button>
 
             <div className="flex items-center gap-8">
               {LINKS.map((link, i) => (
                 <motion.button
-                  key={link}
-                  onClick={() => setActive(link)}
-                  className="relative font-sans text-sm tracking-widest uppercase text-white/60 hover:text-white transition-colors duration-200 pointer-events-auto"
+                  key={link.href}
+                  onClick={() => router.push(link.href)}
+                  className="relative font-sans text-sm tracking-widest uppercase text-white/60 hover:text-white transition-colors duration-200 pointer-events-auto cursor-pointer"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 + i * 0.08, duration: 0.3 }}
                 >
-                  {link}
-                  {active === link && (
+                  {link.label}
+                  {activeHref === link.href && (
                     <motion.span
                       layoutId="topbar-indicator"
                       className="absolute -bottom-1 left-0 right-0 h-px bg-white"
@@ -119,28 +130,22 @@ export default function TelemetryNavbar() {
               ref={pillRef}
               className="relative flex items-center gap-1 px-1.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl"
             >
-              {/* sliding indicator */}
               <span
                 ref={indicatorRef}
                 className="absolute rounded-full bg-white/10 border border-white/20 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none"
                 style={{ top: 6 }}
               />
-
               {LINKS.map((link, i) => (
                 <button
-                  key={link}
-                  ref={(el) => {
-                    itemRefs.current[i] = el;
-                  }}
-                  onClick={() => setActive(link)}
-                  className={`relative z-10 flex items-center gap-1 rounded-full px-5 py-1.5 text-xs tracking-widest uppercase font-sans transition-colors duration-200 ${
-                    active === link
-                      ? "text-white"
-                      : "text-white/40 hover:text-white/70"
+                  key={link.href}
+                  ref={el => { itemRefs.current[i] = el; }}
+                  onClick={() => router.push(link.href)}
+                  className={`relative z-10 flex items-center gap-1 rounded-full px-5 py-1.5 text-xs tracking-widest uppercase font-sans transition-colors duration-200 cursor-pointer ${
+                    activeHref === link.href ? "text-white" : "text-white/40 hover:text-white/70"
                   }`}
                 >
-                  {active === link && <BlinkDot />}
-                  {link}
+                  {activeHref === link.href && <BlinkDot />}
+                  {link.label}
                 </button>
               ))}
             </div>

@@ -34,7 +34,7 @@ export default function Home() {
           centerY={0}
           zoom={0.6}
         />
-        <TelemetryFlow className="absolute inset-0 z-10 showGrid" />
+        <TelemetryFlow className="absolute inset-0 z-10 showGrid"/>
       </div>
 
       {/* Cursor trail */}
@@ -51,7 +51,8 @@ export default function Home() {
 
       {/* Content */}
       <div className="relative z-30 flex flex-col items-center">
-        <h1 className="font-tech text-white text-[7vw]">36</h1>
+        {/* <h1 className="font-tech text-white text-[7vw]">36</h1> */}
+        <DecryptedText text="36" encryptedClassName="text-[#B9E901]" parentClassName="font-tech text-[7vh]" className="text-[#FFFFFF]" speed={40} maxIterations={25} animateOn="view"></DecryptedText>
         <h3 className="font-serif text-white text-[2vw] text-center w-full">
           <i>WHE </i>
           <span className="font-sans font-extrabold">RE INNOVATION ME</span>
