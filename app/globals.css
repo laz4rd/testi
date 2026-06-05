@@ -6,7 +6,7 @@
 
 :root {
   --font-sans: var(--font-barow-condensed);
-  --font-serif: var(--font-playfair-display);
+  --font-serif: var(--font-instrument-serif); 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -43,6 +43,10 @@
 
 .font-tech {
   font-family: var(--font-tech) !important;
+}
+
+.font-serif {
+  font-family: var(--font-instrument-serif) !important;
 }
 
 @theme inline {

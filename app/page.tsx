@@ -14,9 +14,9 @@ export default function Home() {
           color1="#FC0F49"
           color2="#ff3566"
           color3="#a20f33"
-          timeSpeed={0.25}
+          timeSpeed={2}
           colorBalance={-0.6}
-          warpStrength={1}
+          warpStrength={4}
           warpFrequency={5}
           warpSpeed={2.5}
           warpAmplitude={50}
@@ -32,23 +32,18 @@ export default function Home() {
           saturation={1.1}
           centerX={0}
           centerY={0}
-          zoom={0.9}
+          zoom={0.6}
         />
         <TelemetryFlow className="absolute inset-0 z-10 showGrid" />
       </div>
-      <div className="relative z-10">
-        <motion.h1
-  className="font-tech text-[#FFFFFF] text-[20vw]"
-  initial={{ opacity: 0 }}
-  animate={{ opacity: [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1] }}
-  transition={{
-    duration: 0.8,
-    times: [0, 0.19, 0.2, 0.39, 0.4, 0.59, 0.6, 0.79, 0.8, 0.99, 1],
-    ease: "linear",
-  }}
->
-  36
-</motion.h1>
+      <div className="relative z-10 flex flex-col items-center">
+        <h1 className="font-tech text-white text-[7vw]">36</h1>
+
+        <h3 className="font-serif text-white text-[2vw] text-center w-full">
+          <i>WHE </i>
+          <span className="font-sans font-extrabold">RE INNOVATION ME</span>
+          <i>ETS ME</i>
+        </h3>
       </div>
     </div>
   );
