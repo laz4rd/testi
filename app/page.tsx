@@ -2,10 +2,19 @@
 import DecryptedText from "@/components/DecryptedText";
 import Grainient from "@/components/Grainient";
 import TelemetryFlow from "@/components/Telemetry";
-import { motion } from "framer-motion";
 import PixelTrail from "@/components/PixelTrail";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
     <div className="relative flex flex-col flex-1 items-center justify-center overflow-hidden">
       {/* Background */}
@@ -34,26 +43,35 @@ export default function Home() {
           centerY={0}
           zoom={0.6}
         />
-        <TelemetryFlow className="absolute inset-0 z-10 showGrid"/>
+        <TelemetryFlow className="absolute inset-0 z-10 showGrid" />
       </div>
 
-      {/* Cursor trail */}
-      <div className="absolute inset-0 z-20 pointer-events-none">
-        <PixelTrail
-          gridSize={22}
-          trailSize={0.1}
-          maxAge={500}
-          interpolate={2.6}
-          color="#B9E901"
-          gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
-        />
-      </div>
+      {/* Cursor trail — desktop only */}
+      {!isMobile && (
+        <div className="absolute inset-0 z-20 pointer-events-none" style={{ isolation: "isolate" }}>
+          <PixelTrail
+            gridSize={22}
+            trailSize={0.1}
+            maxAge={500}
+            interpolate={2.6}
+            color="#B9E901"
+            gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
+          />
+        </div>
+      )}
 
       {/* Content */}
-      <div className="relative z-30 flex flex-col items-center">
-        {/* <h1 className="font-tech text-white text-[7vw]">36</h1> */}
-        <DecryptedText text="36" encryptedClassName="text-[#B9E901]" parentClassName="font-tech text-[7vh]" className="text-[#FFFFFF]" speed={40} maxIterations={25} animateOn="view"></DecryptedText>
-        <h3 className="font-serif text-white text-[2vw] text-center w-full">
+      <div className="relative z-30 flex flex-col items-center px-4">
+        <DecryptedText
+          text="36"
+          encryptedClassName="text-[#B9E901]"
+          parentClassName="font-tech text-[20vw] sm:text-[12vw] md:text-[7vw]"
+          className="text-[#FFFFFF]"
+          speed={40}
+          maxIterations={25}
+          animateOn="view"
+        />
+        <h3 className="font-serif text-white text-[4vw] sm:text-[3vw] md:text-[2vw] text-center w-full">
           <i>WHE </i>
           <span className="font-sans font-extrabold">RE INNOVATION ME</span>
           <i>ETS ME</i>

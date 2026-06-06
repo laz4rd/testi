@@ -5,6 +5,7 @@ import { mdxComponents } from "@/components/MDXComponents";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
 import TelemetryFlow from "@/components/Telemetry";
+import BlogFooterGrainient from "@/components/BlogFooterGrainient";
 
 export async function generateStaticParams() {
   const posts = getAllPosts();
@@ -142,6 +143,7 @@ export default async function PostPage({
           </span>
         </div>
       </div>
+      <BlogFooterGrainient/>
     </div>
   );
 }
