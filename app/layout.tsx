@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, Instrument_Serif, Geist } from "next/font/google";
+import {
+  Barlow_Condensed,
+  Instrument_Serif,
+  Geist,
+  Noto_Serif,
+} from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import TelemetryNavbar from "@/components/TelemetryNavbar";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const notoSerif = Noto_Serif({subsets:['latin'],variable:'--font-serif'});
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-geo" });
 
 const barlowCondensed = Barlow_Condensed({
-  variable: "--font-barow-condensed",
+  variable: "--font-barlow-condensed",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
@@ -24,7 +31,7 @@ const instrumentSerif = Instrument_Serif({
 const displayTech = localFont({
   src: "./fonts/Display.otf",
   variable: "--font-tech",
-  display:"swap"
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -40,9 +47,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", barlowCondensed.variable, instrumentSerif.variable, displayTech.variable, "font-sans", geist.variable)}
+      className={cn(
+              "h-full",
+              "dark",
+              "antialiased",
+              barlowCondensed.variable,
+              instrumentSerif.variable,
+              displayTech.variable,
+              geist.variable,
+              notoSerif.variable)}
     >
-      <body className="min-h-full flex flex-col"><TelemetryNavbar />{children}</body>
+      <body className="min-h-full flex flex-col">
+        <TelemetryNavbar />
+        {children}
+      </body>
     </html>
   );
 }

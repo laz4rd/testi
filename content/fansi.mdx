@@ -1,0 +1,231 @@
+---
+id: "002"
+date: "2026.06.06"
+title: "FANSI Logger"
+category: "Developer Tools"
+readTime: "05 MIN"
+status: "PUBLISHED"
+description: "Creating a lightweight ANSI color logger for Java CLI applications."
+---
+
+# **Building FANSI Logger: Because I Missed Colorama**
+
+For a long time, whenever I needed colorful terminal output, I reached for Python.
+
+Not because Python was necessarily the best language for the task, but because libraries like Colorama made command-line applications feel pleasant to build.
+
+A few lines of code and suddenly a terminal application could communicate clearly through color, symbols, and formatting.
+
+Then I started writing more Java.
+
+And I found myself asking a surprisingly simple question:
+
+Where’s the Java equivalent?
+
+There were logging frameworks.
+
+There were configuration-heavy solutions.
+
+There were enterprise-grade libraries.
+
+But I couldn’t find the kind of lightweight, developer-friendly logger I was looking for.
+
+So I built one.
+
+---
+
+## **The Problem**
+
+Most command-line applications communicate entirely through text.
+
+That works.
+
+Until the application grows.
+
+Soon you have:
+
+```
+Application started
+Configuration loaded
+Database connected
+File not found
+User authenticated
+```
+
+Everything begins looking the same.
+
+Warnings blend into information.
+
+Errors disappear in a sea of console output.
+
+The human eye has to do all the work.
+
+Color solves that problem instantly.
+
+---
+
+## **A Simpler Approach**
+
+FANSI Logger was designed around a single idea:
+
+Important messages should look important.
+
+Instead of writing:
+
+```java
+System.out.println("Application started");
+```
+
+you can write:
+
+```java
+Logger.info("Application started");
+```
+
+or
+
+```java
+Logger.success("Database connection established");
+```
+
+or
+
+```java
+Logger.error("Failed to load configuration");
+```
+
+and immediately get visual distinction between different message types.
+
+---
+
+## **More Than Colors**
+
+Once the color system existed, I started adding additional quality-of-life features.
+
+Section headers:
+
+```
+═══════════════════════════════
+        MY APPLICATION
+═══════════════════════════════
+```
+
+Dividers:
+
+```
+───────────────────────────────
+```
+
+Status symbols:
+
+```
+[ℹ INFO]
+[✔ SUCCESS]
+[✖ ERROR]
+[⚠ WARN]
+[⚙ SYS]
+```
+
+These small additions dramatically improved readability in larger CLI projects.
+
+---
+
+## **The “Fun” Features**
+
+Not every feature was built purely for productivity.
+
+Some were built because command-line applications deserve personality.
+
+One of my favorites is the typing effect:
+
+```java
+Logger.type("Hello World", 50);
+```
+
+Instead of printing instantly, the text appears character by character.
+
+Is it necessary?
+
+Not at all.
+
+Is it fun?
+
+Absolutely.
+
+And sometimes that’s reason enough.
+
+---
+
+## **Design Goals**
+
+While building FANSI Logger I tried to keep a few rules in mind:
+
+- No unnecessary complexity
+- No external dependencies
+- Minimal setup
+- Easy to remember API
+- Useful defaults
+
+The goal wasn’t to compete with enterprise logging frameworks.
+
+The goal was to make small command-line projects feel better.
+
+---
+
+## **Publishing The Library**
+
+One of the most rewarding parts of the project wasn’t writing the code.
+
+It was publishing it.
+
+For the first time, I packaged a Java library, published it to Maven, and made it available for other developers to use in their own projects.
+
+Seeing:
+
+```xml
+<dependency>
+    <groupId>com.laz4rd</groupId>
+    <artifactId>fansi-logger</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+felt strangely satisfying.
+
+The project had gone from a personal utility to something anyone could install.
+
+---
+
+## **What I Learned**
+
+FANSI Logger reinforced something I’ve learned repeatedly through side projects:
+
+The best projects often start with a small annoyance.
+
+I wasn’t trying to create a logging ecosystem.
+
+I wasn’t trying to build the next major Java framework.
+
+I simply missed a tool I enjoyed using in another language.
+
+So I built my own version.
+
+Sometimes that’s all a project needs.
+
+---
+
+## **Looking Ahead**
+
+FANSI Logger currently focuses on colorful terminal output and simple formatting utilities.
+
+Future versions may explore:
+
+- Additional formatting styles
+- Better customization
+- Themes
+- Structured logging support
+- Improved cross-platform compatibility
+
+But the core idea will remain the same:
+
+Make command-line applications easier to read and a little more enjoyable to use.
