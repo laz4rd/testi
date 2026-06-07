@@ -1,13 +1,12 @@
 "use client";
 import { useState } from "react";
 
-export default function MDXCodeBlock({
-  children,
-  className,
-}: {
-  children: string;
+interface MDXCodeBlockProps {
+  children?: string;
   className?: string;
-}) {
+}
+
+export default function MDXCodeBlock({ children = "", className }: MDXCodeBlockProps) {
   const [copied, setCopied] = useState(false);
   const language = className?.replace("language-", "") ?? "code";
 

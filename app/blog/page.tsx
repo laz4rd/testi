@@ -3,7 +3,6 @@ import PostEntry from "@/components/PostEntry";
 import BlogHeader from "@/components/BlogHeader";
 import BlogFooter from "@/components/BlogFooter";
 import TelemetryFlow from "@/components/Telemetry";
-import Grainient from "@/components/Grainient";
 import BlogFooterGrainient from "@/components/BlogFooterGrainient";
 
 export default async function BlogPage() {

@@ -339,7 +339,8 @@ export default function DecryptedText({
     };
   }, [animateOn, hasAnimated, triggerDecrypt]);
 
-  useEffect(() => {
+useEffect(() => {
+  setTimeout(() => {
     if (animateOn === 'click') {
       encryptInstantly();
     } else {
@@ -348,7 +349,8 @@ export default function DecryptedText({
     }
     setRevealedIndices(new Set());
     setDirection('forward');
-  }, [animateOn, text, encryptInstantly]);
+  }, 0);
+}, [animateOn, text, encryptInstantly]);
 
   const animateProps =
     animateOn === 'hover' || animateOn === 'inViewHover'
