@@ -5,6 +5,7 @@ import BlogFooter from "@/components/BlogFooter";
 import TelemetryFlow from "@/components/Telemetry";
 import BlogFooterGrainient from "@/components/BlogFooterGrainient";
 
+
 export default async function BlogPage() {
   const posts = await getAllPosts();
   return (

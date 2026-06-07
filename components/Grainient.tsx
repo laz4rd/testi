@@ -256,7 +256,7 @@ const Grainient: React.FC<GrainientProps> = ({
 
     const onVisibility = () => {
       isPageVisible = !document.hidden;
-      isPageVisible ? tryStart() : tryStop();
+      
     };
     document.addEventListener('visibilitychange', onVisibility);
 

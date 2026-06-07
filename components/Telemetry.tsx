@@ -259,7 +259,7 @@ export default function TelemetryFlow({
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
     };
-  }, []);
+  }, [showGrid]);
 
   return (
     <canvas

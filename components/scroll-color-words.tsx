@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
+
 
 function ColoredWord({
   word,
@@ -13,7 +14,7 @@ function ColoredWord({
   word: string;
   idx: number;
   total: number;
-  scrollYProgress: any;
+  scrollYProgress: MotionValue<number>;
   targetColor: string;
 }) {
   const color = useTransform(
@@ -31,32 +32,15 @@ function ColoredWord({
 }
 
 export function ScrollColorWords({ children }: { children: string }) {
-  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
-    target: mounted ? ref : undefined,
+    target: ref,
     offset: ["start 80%", "end 20%"],
   });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const targetColor ="#FC0F49";
+  const targetColor = "#FC0F49";
   const words = children.split(" ");
-
-  if (!mounted) {
-    return (
-      <div className="px-6 py-24 sm:px-12 lg:px-16">
-        <div className="flex justify-center">
-          <p className="font-geist text-justify text-lg leading-relaxed text-gray-400 sm:text-xl lg:text-2xl max-w-2xl">
-            {children}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div ref={ref} className="px-6 py-24 sm:px-12 lg:px-16">
