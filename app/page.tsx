@@ -4,6 +4,7 @@ import Grainient from "@/components/Grainient";
 import TelemetryFlow from "@/components/Telemetry";
 import PixelTrail from "@/components/PixelTrail";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
@@ -48,7 +49,10 @@ export default function Home() {
 
       {/* Cursor trail — desktop only */}
       {!isMobile && (
-        <div className="absolute inset-0 z-20 pointer-events-none" style={{ isolation: "isolate" }}>
+        <div
+          className="absolute inset-0 z-20 pointer-events-none"
+          style={{ isolation: "isolate" }}
+        >
           <PixelTrail
             gridSize={22}
             trailSize={0.1}
@@ -77,6 +81,26 @@ export default function Home() {
           <i>ETS ME</i>
         </h3>
       </div>
+       <div className="absolute bottom-8 left-8 z-30 flex items-center gap-3">
+  {/* Pulse indicator */}
+  <div className="flex flex-col items-center gap-1">
+    <motion.div
+      className="w-px bg-white/40"
+      animate={{ height: ["12px", "24px", "12px"] }}
+      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+    />
+    <div className="w-1 h-1 rounded-full bg-[#FC0F49] animate-pulse" />
+  </div>
+
+  {/* Link */}
+  <a
+    href="/about"
+    className="font-mono font-bold text-[11px] tracking-[0.3em] uppercase text-white/60 hover:text-white transition-colors duration-300 border-b border-white/20 hover:border-white pb-0.5"
+    style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+  >
+    Access Portfolio →
+  </a>
+</div>
     </div>
   );
 }

@@ -9,46 +9,24 @@ interface VideoCardProps {
   type: string;
   year: string;
   id: string;
-}
-
-function VideoModal({ src, title, onClose }: { src: string; title: string; onClose: () => void }) {
+  youtubeUrl?: string;
+}function VideoModal({ src, title, youtubeUrl, onClose }: { 
+  src: string; 
+  title: string; 
+  youtubeUrl?: string;
+  onClose: () => void 
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(true);
+  const [ended, setEnded] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
 
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) { videoRef.current.play(); setPlaying(true); }
-    else { videoRef.current.pause(); setPlaying(false); }
-  };
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (e.key === " ") { e.preventDefault(); togglePlay(); }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
-
-  const handleTimeUpdate = () => {
-    if (!videoRef.current) return;
-    setProgress((videoRef.current.currentTime / videoRef.current.duration) * 100);
-  };
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!videoRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    videoRef.current.currentTime = pct * videoRef.current.duration;
-  };
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  };
 
   return (
     <motion.div
@@ -58,13 +36,8 @@ function VideoModal({ src, title, onClose }: { src: string; title: string; onClo
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
     >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-xl"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={onClose} />
 
-      {/* Modal */}
       <motion.div
         className="relative z-10 w-full max-w-4xl"
         initial={{ scale: 0.97, opacity: 0, y: 12 }}
@@ -74,9 +47,7 @@ function VideoModal({ src, title, onClose }: { src: string; title: string; onClo
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="font-mono text-[10px] tracking-widest text-white/30 mb-0.5">{title}</p>
-          </div>
+          <p className="font-mono text-[10px] tracking-widest text-white/30">{title}</p>
           <button
             onClick={onClose}
             className="font-mono text-[10px] tracking-widest text-white/30 hover:text-white/70 transition-colors duration-200"
@@ -85,78 +56,77 @@ function VideoModal({ src, title, onClose }: { src: string; title: string; onClo
           </button>
         </div>
 
-        {/* Video */}
+        {/* Video container */}
         <div
-          className="relative rounded-2xl overflow-hidden bg-black cursor-pointer border border-white/8"
+          className="relative rounded-2xl overflow-hidden bg-black border border-white/8"
           style={{ aspectRatio: "16/9" }}
-          onClick={togglePlay}
         >
           <video
             ref={videoRef}
             src={src}
             autoPlay
-            className="w-full h-full object-cover"
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={() => setDuration(videoRef.current?.duration ?? 0)}
             muted={muted}
+            className="w-full h-full object-cover"
+            onEnded={() => setEnded(true)}
           />
 
+          {/* Ended overlay */}
           <AnimatePresence>
-            {!playing && (
+            {ended && (
               <motion.div
-                className="absolute inset-0 flex items-center justify-center"
+                className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black/70 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
               >
-                <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
-                    <path d="M3 2l9 5-9 5V2z" />
-                  </svg>
-                </div>
+                <p className="font-mono text-[10px] tracking-widest text-white/40">
+                  PREVIEW ENDED
+                </p>
+                {youtubeUrl ? (
+                  <a
+                    href={youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 px-6 py-3 rounded-full border border-white/20 hover:border-white/50 hover:bg-white/5 transition-all duration-200"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-[#FC0F49]">
+                      <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <span className="font-mono text-[11px] tracking-widest text-white/70 group-hover:text-white transition-colors duration-200">
+                      WATCH ON YOUTUBE
+                    </span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEnded(false);
+                      if (videoRef.current) {
+                        videoRef.current.currentTime = 0;
+                        videoRef.current.play();
+                      }
+                    }}
+                    className="font-mono text-[11px] tracking-widest text-white/40 hover:text-white transition-colors duration-200"
+                  >
+                    REPLAY
+                  </button>
+                )}
+
+                <button
+                  onClick={onClose}
+                  className="font-mono text-[10px] tracking-widest text-white/20 hover:text-white/50 transition-colors duration-200"
+                >
+                  CLOSE
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        {/* Controls */}
-        <div className="mt-3 flex items-center gap-4">
-          <button onClick={togglePlay} className="text-white/40 hover:text-white transition-colors duration-200">
-            {playing ? (
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                <rect x="1" y="1" width="3.5" height="10" rx="1" />
-                <rect x="7.5" y="1" width="3.5" height="10" rx="1" />
-              </svg>
-            ) : (
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                <path d="M2 1.5l9 4.5-9 4.5V1.5z" />
-              </svg>
-            )}
-          </button>
-
-          <span className="font-mono text-[10px] text-white/25 w-8 shrink-0">
-            {formatTime((progress / 100) * duration)}
-          </span>
-
-          <div
-            className="flex-1 h-px bg-white/10 relative cursor-pointer group"
-            onClick={handleSeek}
+          {/* Mute button */}
+          <button
+            onClick={() => setMuted(!muted)}
+            className="absolute bottom-3 right-3 text-white/40 hover:text-white transition-colors duration-200 bg-black/30 rounded-full p-1.5"
           >
-            <div
-              className="absolute left-0 top-0 h-full bg-white/60 transition-all duration-75"
-              style={{ width: `${progress}%` }}
-            />
-            <div
-              className="absolute top-1/2 w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-              style={{ left: `${progress}%`, transform: "translate(-50%, -50%)" }}
-            />
-          </div>
-
-          <span className="font-mono text-[10px] text-white/25 w-8 shrink-0 text-right">
-            {formatTime(duration)}
-          </span>
-
-          <button onClick={() => setMuted(!muted)} className="text-white/40 hover:text-white transition-colors duration-200">
             {muted ? (
               <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" opacity="0.4">
                 <path d="M1 4h2.5l3.5-2.5v9L3.5 8H1V4z" />
@@ -173,8 +143,7 @@ function VideoModal({ src, title, onClose }: { src: string; title: string; onClo
     </motion.div>
   );
 }
-
-export function VideoCard({ src, thumbnail, title, type, year}: VideoCardProps) {
+export function VideoCard({ src, thumbnail, title, type, year, id, youtubeUrl }: VideoCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -189,67 +158,46 @@ export function VideoCard({ src, thumbnail, title, type, year}: VideoCardProps) 
   return (
     <>
       <div
-  ref={cardRef}
-  className="group relative border border-white/8 hover:border-white/16 transition-all duration-300 cursor-none bg-white/[0.02]"
-  style={{ borderRadius: "16px", overflow: "hidden", isolation: "isolate" }}
-  onMouseEnter={() => setHovered(true)}
-  onMouseLeave={() => setHovered(false)}
-  onMouseMove={handleMouseMove}
-  onClick={() => setModalOpen(true)}
->
-        {/* Thumbnail / video preview */}
+        ref={cardRef}
+        className="group relative border border-white/8 hover:border-white/16 transition-all duration-300 cursor-none bg-white/[0.02]"
+        style={{ borderRadius: "16px", overflow: "hidden", isolation: "isolate" }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onMouseMove={handleMouseMove}
+        onClick={() => setModalOpen(true)}
+      >
         <div
-  className="relative w-full"
-  style={{ aspectRatio: "16/9", borderRadius: "16px 16px 0 0", overflow: "hidden" }}
->
-          {thumbnail ? (
-            <img src={thumbnail} alt={title} className="w-full h-full object-cover" />
-          ) : (
-            <video
-              src={src}
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-              ref={el => {
-                if (!el) return;
-                if (hovered) el.play().catch(() => {});
-                else { el.pause(); el.currentTime = 0; }
-              }}
-            />
-          )}
-
-          {/* Overlay */}
+          className="relative w-full"
+          style={{ aspectRatio: "16/9", borderRadius: "16px 16px 0 0", overflow: "hidden" }}
+        >
+          <video
+            src={src}
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+            ref={el => {
+              if (!el) return;
+              if (hovered) el.play().catch(() => {});
+              else { el.pause(); el.currentTime = 0; }
+            }}
+          />
           <motion.div
             className="absolute inset-0 bg-black"
             animate={{ opacity: hovered ? 0.2 : 0.45 }}
             transition={{ duration: 0.3 }}
           />
-
-          {/* Cursor play button — pink square */}
           <AnimatePresence>
             {hovered && (
               <motion.div
                 className="absolute pointer-events-none"
-                style={{
-                  left: cursorPos.x,
-                  top: cursorPos.y,
-                  x: "-50%",
-                  y: "-50%",
-                }}
+                style={{ left: cursorPos.x, top: cursorPos.y, x: "-50%", y: "-50%" }}
                 initial={{ scale: 0, opacity: 0 }}
-                animate={{
-                  scale: 1,
-                  opacity: [0, 0, 1, 1, 0, 0, 1],
-                }}
+                animate={{ scale: 1, opacity: [0, 0, 1, 1, 0, 0, 1] }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{
                   scale: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
-                  opacity: {
-                    duration: 0.8,
-                    times: [0, 0.19, 0.2, 0.49, 0.5, 0.79, 0.8],
-                    ease: "linear",
-                  },
+                  opacity: { duration: 0.5, times: [0, 0.19, 0.2, 0.49, 0.5, 0.79, 0.8], ease: "linear" },
                 }}
               >
                 <div
@@ -262,7 +210,6 @@ export function VideoCard({ src, thumbnail, title, type, year}: VideoCardProps) 
           </AnimatePresence>
         </div>
 
-        {/* Meta */}
         <div className="px-4 py-3 flex items-center justify-between">
           <div>
             <p className="font-sans font-bold text-white text-sm uppercase tracking-tight leading-none mb-1">
@@ -276,7 +223,12 @@ export function VideoCard({ src, thumbnail, title, type, year}: VideoCardProps) 
 
       <AnimatePresence>
         {modalOpen && (
-          <VideoModal src={src} title={title} onClose={() => setModalOpen(false)} />
+          <VideoModal
+            src={src}
+            title={title}
+            youtubeUrl={youtubeUrl}
+            onClose={() => setModalOpen(false)}
+          />
         )}
       </AnimatePresence>
     </>
