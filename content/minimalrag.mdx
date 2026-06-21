@@ -1,0 +1,397 @@
+---
+id: "003"
+date: "2026-06-21"
+title: "Building a Minimal RAG System From Scratch"
+category: "AI Systems"
+readTime: "12 MIN"
+status: "PUBLISHED"
+description: "A hands-on breakdown of building a minimal Retrieval-Augmented Generation system using chunking, embeddings, vector search, and FastAPI."
+---
+# Building a Minimal RAG System From Scratch
+
+This started as a simple experiment:
+
+> What actually happens when you build a RAG system yourself, without frameworks hiding the internals?
+
+Not using abstractions.  
+Not using prebuilt pipelines.  
+Just the raw components.
+
+So I built a minimal Retrieval-Augmented Generation (RAG) system in Python — step by step — to understand how it really works.
+
+---
+
+# The Idea
+
+At its core, RAG is simple:
+
+> Instead of asking a model to *know everything*, we make it *look things up first*.
+
+So the pipeline becomes:
+
+1. Load documents  
+2. Split them into chunks  
+3. Convert chunks into embeddings  
+4. Store them in a vector database  
+5. Retrieve relevant chunks for a question  
+6. Feed them into a language model  
+
+That’s it.
+
+Everything else is engineering around this flow.
+
+---
+
+# Tech Stack
+
+This project is intentionally minimal.
+
+## 🧠 AI / LLM Layer
+- **Ollama**
+  - Local inference runtime
+  - Models used for generation
+- **Nomic Embed Model**
+  - Used for converting text → embeddings
+
+---
+
+## ⚙️ Backend
+- **Python 3.9**
+- **FastAPI**
+  - Exposes the RAG pipeline as an API
+- **Uvicorn**
+  - ASGI server
+
+---
+
+## 📄 Document Processing
+- Custom PDF text extraction
+- Simple chunking logic (no frameworks)
+
+---
+
+## 🧮 Vector Store
+- Lightweight custom vector database
+- Stores:
+  - chunk text
+  - embeddings
+  - chunk IDs
+- Cosine similarity for retrieval
+
+---
+
+## 🧰 Utilities
+- NumPy (vector math)
+- Standard Python libraries
+- Ollama Python client
+
+---
+
+# Step 1: Document Ingestion
+
+Everything starts with raw text.
+
+```python
+from pdf_read import extract_pdf_text
+
+text = extract_pdf_text("documents/sample.pdf")
+````
+
+At this point, the system is still blind — just raw text.
+
+---
+
+# Step 2: Chunking
+
+Large documents are broken into smaller pieces.
+
+```python
+from chunker import create_chunks
+
+chunks = create_chunks(text)
+print("Total Chunks:", len(chunks))
+```
+
+Each chunk represents a meaningful section of the document.
+
+This step directly affects retrieval quality later.
+
+---
+
+# Step 3: Embeddings
+
+Each chunk is converted into a vector.
+
+```python
+from embedder import get_embedding
+
+embedding = get_embedding(chunk)
+print(len(embedding))
+```
+
+Now text becomes geometry.
+
+Meaning is represented as position in vector space.
+
+---
+
+# Step 4: Storing in Vector DB
+
+Each chunk + embedding pair is stored.
+
+```python
+from vector_store import add_chunk
+
+for i, chunk in enumerate(chunks):
+    embedding = get_embedding(chunk)
+
+    add_chunk(
+        chunk_id=i,
+        chunk_text=chunk,
+        embedding=embedding
+    )
+```
+
+Now the system has “memory”.
+
+---
+
+# Step 5: Querying the System
+
+When a question is asked:
+
+1. Convert question → embedding
+    
+2. Compare with stored vectors
+    
+3. Retrieve most relevant chunks
+    
+
+```python
+from vector_store import search
+from embedder import get_embedding
+
+question = "What is RAG?"
+
+question_embedding = get_embedding(question)
+chunks = search(question_embedding)
+```
+
+This is semantic search — not keyword search.
+
+---
+
+# Step 6: Building Context
+
+Retrieved chunks are combined into context.
+
+```python
+context = "\n\n".join(chunks)
+```
+
+This context is what grounds the LLM.
+
+Without it, the model is guessing.
+
+With it, the model is referencing actual data.
+
+---
+
+# Step 7: Generation
+
+The context is passed into the LLM.
+
+```python
+from ollama import chat
+
+response = chat(
+    model="gemma3:8b",
+    messages=[
+        {
+            "role": "system",
+            "content": f"""
+Answer ONLY using the provided context.
+
+CONTEXT:
+{context}
+"""
+        },
+        {
+            "role": "user",
+            "content": question
+        }
+    ]
+)
+
+print(response["message"]["content"])
+```
+
+Now the system produces grounded answers.
+
+---
+
+# FastAPI Layer (Turning It Into a Service)
+
+Once the pipeline worked in scripts, the next step was exposing it as an API.
+
+---
+
+## API Setup
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from embedder import get_embedding
+from vector_store import search
+from ollama import chat
+
+app = FastAPI()
+
+class Query(BaseModel):
+    question: str
+```
+
+---
+
+## Query Endpoint
+
+```python
+@app.post("/query")
+def query_rag(data: Query):
+
+    question_embedding = get_embedding(data.question)
+    chunks = search(question_embedding)
+
+    context = "\n\n".join(chunks)
+
+    response = chat(
+        model="gemma3:8b",
+        messages=[
+            {
+                "role": "system",
+                "content": f"Answer only using context:\n{context}"
+            },
+            {
+                "role": "user",
+                "content": data.question
+            }
+        ]
+    )
+
+    return {
+        "answer": response["message"]["content"],
+        "sources": len(chunks)
+    }
+```
+
+---
+
+## Running the Server
+
+```bash
+uvicorn app:app --reload
+```
+
+---
+
+# What Changed After FastAPI
+
+Before:
+
+- Everything was manual scripts
+    
+- No structured interface
+    
+- Hard to reuse pipeline
+    
+
+After:
+
+- System becomes queryable
+    
+- Clean separation of components
+    
+- Ready for integration with frontend or multi-user systems
+    
+
+---
+
+# What This System Actually Does
+
+At runtime, the full flow looks like:
+
+```
+PDF → chunks → embeddings → vector DB → retrieval → LLM → answer
+```
+
+But the important part is:
+
+> The model is never guessing — it is always grounded in retrieved context.
+
+---
+
+# Key Insight
+
+The hardest part of RAG is not the LLM.
+
+It’s everything around it:
+
+- chunking strategy
+    
+- embedding quality
+    
+- retrieval logic
+    
+- context construction
+    
+- prompt design
+    
+
+The model is just the final step.
+
+---
+
+# Limitations (Intentional)
+
+This system is still a prototype:
+
+- no reranking
+    
+- no hybrid search
+    
+- no caching
+    
+- no evaluation layer
+    
+- simple vector similarity only
+    
+
+But that was the point.
+
+Understanding first. Optimizing later.
+
+---
+
+# What This Becomes Next
+
+This minimal system is the base for:
+
+- multi-user study clusters
+    
+- persistent memory systems
+    
+- better retrieval strategies
+    
+- UI-based document chat
+    
+- scalable backend architecture
+    
+
+---
+
+# Closing Thought
+
+Building this from scratch made one thing very clear:
+
+> RAG is not magic — it’s a pipeline where every step matters.
